@@ -45,6 +45,16 @@ ENV/
 *_transcript*.txt
 chunk*.wav
 
+# Video files (too large for GitHub)
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.flv
+*.wmv
+*.webm
+*.m4v
+
 # Models (Whisper downloads these automatically)
 *.pt
 
