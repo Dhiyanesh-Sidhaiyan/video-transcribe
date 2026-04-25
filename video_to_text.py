@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Extract audio from video and convert to text using Whisper AI.
+Extract audio from video/audio files and convert to text using Whisper AI.
+Supports both video files (MP4, MOV, AVI) and audio files (MP3, WAV, M4A, FLAC).
 """
 
 import os
@@ -8,6 +9,21 @@ import sys
 from pathlib import Path
 import whisper
 import subprocess
+
+
+# Supported file extensions
+VIDEO_EXTENSIONS = {'.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.webm', '.m4v'}
+AUDIO_EXTENSIONS = {'.mp3', '.wav', '.m4a', '.flac', '.aac', '.ogg', '.wma', '.opus'}
+
+
+def is_video_file(file_path: str) -> bool:
+    """Check if file is a video file based on extension."""
+    return Path(file_path).suffix.lower() in VIDEO_EXTENSIONS
+
+
+def is_audio_file(file_path: str) -> bool:
+    """Check if file is an audio file based on extension."""
+    return Path(file_path).suffix.lower() in AUDIO_EXTENSIONS
 
 
 def extract_audio(video_path: str, output_audio_path: str) -> None:
@@ -60,25 +76,45 @@ def transcribe_audio(audio_path: str, model_name: str = "base") -> dict:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python video_to_text.py <video_file_path> [model_size]")
+        print("Usage: python video_to_text.py <file_path> [model_size]")
+        print("")
+        print("Supports:")
+        print("  - Video files: MP4, MOV, AVI, MKV, FLV, WMV, WEBM, M4V")
+        print("  - Audio files: MP3, WAV, M4A, FLAC, AAC, OGG, WMA, OPUS")
+        print("")
         print("Model sizes: tiny, base (default), small, medium, large")
         sys.exit(1)
 
-    video_path = sys.argv[1]
+    input_path = sys.argv[1]
     model_size = sys.argv[2] if len(sys.argv) > 2 else "base"
 
-    if not os.path.exists(video_path):
-        print(f"Error: Video file not found: {video_path}")
+    if not os.path.exists(input_path):
+        print(f"Error: File not found: {input_path}")
+        sys.exit(1)
+
+    # Determine file type
+    is_video = is_video_file(input_path)
+    is_audio = is_audio_file(input_path)
+
+    if not is_video and not is_audio:
+        print(f"Error: Unsupported file format: {Path(input_path).suffix}")
+        print(f"Supported video formats: {', '.join(sorted(VIDEO_EXTENSIONS))}")
+        print(f"Supported audio formats: {', '.join(sorted(AUDIO_EXTENSIONS))}")
         sys.exit(1)
 
     # Create output paths
-    base_name = Path(video_path).stem
-    audio_path = f"{base_name}_audio.mp3"
+    base_name = Path(input_path).stem
     text_output = f"{base_name}_transcript.txt"
     detailed_output = f"{base_name}_transcript_detailed.txt"
 
-    # Extract audio
-    extract_audio(video_path, audio_path)
+    # Handle video or audio file
+    if is_video:
+        print(f"📹 Detected video file: {Path(input_path).name}")
+        audio_path = f"{base_name}_audio.mp3"
+        extract_audio(input_path, audio_path)
+    else:
+        print(f"🎵 Detected audio file: {Path(input_path).name}")
+        audio_path = input_path
 
     # Transcribe
     result = transcribe_audio(audio_path, model_size)
@@ -100,12 +136,15 @@ def main():
             f.write(f"[{start_time:.2f}s - {end_time:.2f}s] {text}\n")
 
     print(f"\n{'='*50}")
-    print(f"Transcription complete!")
+    print(f"✅ Transcription complete!")
     print(f"{'='*50}")
-    print(f"Full transcript: {text_output}")
-    print(f"Detailed transcript with timestamps: {detailed_output}")
-    print(f"Audio file: {audio_path}")
-    print(f"\nPreview:\n{result['text'][:300]}...")
+    print(f"📄 Full transcript: {text_output}")
+    print(f"⏱️  Detailed transcript with timestamps: {detailed_output}")
+
+    if is_video:
+        print(f"🎵 Extracted audio: {audio_path}")
+
+    print(f"\n📝 Preview:\n{result['text'][:300]}...")
 
 
 if __name__ == "__main__":

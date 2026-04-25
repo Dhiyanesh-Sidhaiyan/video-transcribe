@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![OpenAI Whisper](https://img.shields.io/badge/Powered%20by-OpenAI%20Whisper-412991.svg)](https://github.com/openai/whisper)
 
-A simple yet powerful tool to extract audio from video files and convert speech to text using OpenAI's Whisper AI. Works completely offline after initial setup!
+A simple yet powerful tool to convert video and audio files to text transcripts using OpenAI's Whisper AI. Works completely offline after initial setup!
 
 ## ✨ Features
 
@@ -12,7 +12,8 @@ A simple yet powerful tool to extract audio from video files and convert speech 
 - 🔒 **Offline**: Works without internet after initial model download
 - ⚡ **Fast Processing**: Multiple model sizes for speed/accuracy tradeoff
 - 📝 **Dual Output**: Plain text + timestamped transcript
-- 🎬 **Universal Format Support**: Works with MP4, MOV, AVI, MKV, and more
+- 🎬 **Video Support**: MP4, MOV, AVI, MKV, FLV, WMV, WEBM, M4V
+- 🎵 **Audio Support**: MP3, WAV, M4A, FLAC, AAC, OGG, WMA, OPUS
 - 🌍 **Multi-language**: Supports 99+ languages (auto-detection)
 
 ## 📋 Table of Contents
@@ -30,7 +31,7 @@ A simple yet powerful tool to extract audio from video files and convert speech 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/video-to-text-converter.git
+git clone https://github.com/Dhiyanesh-Sidhaiyan/video-transcribe.git
 cd video-to-text-converter
 
 # Run automated setup
@@ -39,8 +40,10 @@ cd video-to-text-converter
 # Activate virtual environment
 source env/bin/activate
 
-# Convert your video
+# Convert video or audio to text
 python video_to_text.py path/to/your/video.mp4
+# or
+python video_to_text.py path/to/your/audio.mp3
 ```
 
 Extract audio from video files and convert to text using speech recognition.
@@ -117,19 +120,29 @@ pip install -r requirements.txt
 ### Basic Usage
 
 ```bash
-# Use default 'base' model (good balance of speed and accuracy)
+# Video files
 python video_to_text.py path/to/video.mp4
+
+# Audio files  
+python video_to_text.py path/to/audio.mp3
+python video_to_text.py path/to/recording.wav
 ```
 
 ### Advanced Usage
 
 ```bash
 # Specify model size for better accuracy
-python video_to_text.py path/to/video.mp4 small
+python video_to_text.py interview.mov small
+python video_to_text.py podcast.mp3 medium
 
 # For best accuracy (slower)
-python video_to_text.py path/to/video.mp4 large
+python video_to_text.py lecture.mp4 large
 ```
+
+### Supported Formats
+
+**Video formats:** MP4, MOV, AVI, MKV, FLV, WMV, WEBM, M4V  
+**Audio formats:** MP3, WAV, M4A, FLAC, AAC, OGG, WMA, OPUS
 
 ### Model Size Options
 
@@ -143,22 +156,34 @@ python video_to_text.py path/to/video.mp4 large
 
 ### Processing Pipeline
 
-When you run the script, it will:
+**For video files:**
+1. ✅ **Detect format** and validate input
+2. ✅ **Extract audio** from video using FFmpeg → MP3
+3. ✅ **Download Whisper model** (first run only, ~150MB for 'base')
+4. ✅ **Detect language** automatically
+5. ✅ **Transcribe** with timestamps
+6. ✅ **Generate outputs** (2 text files + extracted audio)
 
-1. ✅ **Extract audio** from video using FFmpeg
-2. ✅ **Download Whisper model** (first run only, ~150MB for 'base')
+**For audio files:**
+1. ✅ **Detect format** and validate input
+2. ✅ **Download Whisper model** (first run only)
 3. ✅ **Detect language** automatically
 4. ✅ **Transcribe** with timestamps
-5. ✅ **Generate outputs** (2 text files + audio)
+5. ✅ **Generate outputs** (2 text files)
 
 ### Output Files
 
-After processing, you'll get three files:
-
+**For video files:**
 ```
 your_video_audio.mp3                    # Extracted audio (MP3 format)
 your_video_transcript.txt               # Clean, continuous text
 your_video_transcript_detailed.txt      # Text with timestamps
+```
+
+**For audio files:**
+```
+your_audio_transcript.txt               # Clean, continuous text
+your_audio_transcript_detailed.txt      # Text with timestamps
 ```
 
 **Example detailed output:**
@@ -170,32 +195,46 @@ your_video_transcript_detailed.txt      # Text with timestamps
 
 ## 💡 Examples
 
-### Example 1: Conference Recording
+### Example 1: Conference Video Recording
 ```bash
 python video_to_text.py conference_2024.mp4 base
-# Output: conference_2024_transcript.txt (with speaker content)
+# Output: conference_2024_transcript.txt + conference_2024_audio.mp3
 ```
 
-### Example 2: Interview Transcription
+### Example 2: Podcast Audio File
+```bash
+python video_to_text.py podcast_episode_5.mp3 small
+# Output: podcast_episode_5_transcript.txt (detailed timestamps)
+```
+
+### Example 3: Interview Video
 ```bash
 python video_to_text.py interview.mov small
 # Better accuracy for multi-speaker content
 ```
 
-### Example 3: Lecture Notes
+### Example 4: Voice Recording
 ```bash
-python video_to_text.py lecture_week3.mp4 tiny
+python video_to_text.py meeting_notes.wav tiny
 # Fast transcription for quick notes
+```
+
+### Example 5: YouTube Download
+```bash
+python video_to_text.py tutorial.webm medium
+# High accuracy for technical content
 ```
 
 ## 🎯 Use Cases
 
-- 📚 **Education**: Transcribe lectures, tutorials, online courses
-- 🎙️ **Podcasts**: Convert video podcasts to text blogs
-- 🎬 **Content Creation**: Generate subtitles, captions
-- 📝 **Documentation**: Meeting notes, interviews, presentations
-- ♿ **Accessibility**: Create text versions of video content
-- 🔍 **SEO**: Make video content searchable
+- 📚 **Education**: Transcribe lectures, tutorials, online courses (video/audio)
+- 🎙️ **Podcasts**: Convert audio podcasts to searchable text blogs
+- 🎬 **Content Creation**: Generate subtitles, captions from video
+- 📝 **Documentation**: Meeting recordings, interviews, presentations
+- ♿ **Accessibility**: Create text versions of multimedia content
+- 🔍 **SEO**: Make video and audio content searchable
+- 🎵 **Music**: Transcribe song lyrics from audio files
+- 📞 **Voice Memos**: Convert voice recordings to text notes
 
 ## 🤝 Contributing
 
