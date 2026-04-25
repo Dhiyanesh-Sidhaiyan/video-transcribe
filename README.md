@@ -19,9 +19,9 @@ A simple yet powerful tool to convert video and audio files to text transcripts 
 ## 📋 Table of Contents
 
 - [Quick Start](#-quick-start)
+- [How It Works](#-how-it-works)
 - [Installation](#-installation)
 - [Usage](#-usage)
-- [How It Works](#-how-it-works)
 - [Dependencies](#-dependencies)
 - [Examples](#-examples)
 - [Contributing](#-contributing)
@@ -47,6 +47,91 @@ python video_to_text.py path/to/your/audio.mp3
 ```
 
 Extract audio from video files and convert to text using speech recognition.
+
+## 🔄 How It Works
+
+### Visual Workflow
+
+```
+┌─────────────────────┐
+│   INPUT FILES       │
+│                     │
+│  📹 Video Files     │  ─────┐
+│  • MP4, MOV, AVI    │       │
+│  • MKV, WEBM, etc.  │       │
+│                     │       │
+│  🎵 Audio Files     │  ─────┤
+│  • MP3, WAV, M4A    │       │
+│  • FLAC, AAC, etc.  │       │
+└─────────────────────┘       │
+                              │
+                              ▼
+                    ┌──────────────────┐
+                    │  AUTO-DETECT     │
+                    │  File Type       │
+                    └────────┬─────────┘
+                             │
+                ┌────────────┴────────────┐
+                │                         │
+         (If Video)                 (If Audio)
+                │                         │
+                ▼                         │
+    ┌────────────────────┐                │
+    │  EXTRACT AUDIO     │                │
+    │  FFmpeg: Video→MP3 │                │
+    └────────┬───────────┘                │
+             │                            │
+             └────────────┬───────────────┘
+                          │
+                          ▼
+              ┌───────────────────────┐
+              │   WHISPER AI MODEL    │
+              │                       │
+              │  1️⃣  Load Model       │
+              │  2️⃣  Detect Language  │
+              │  3️⃣  Transcribe       │
+              │  4️⃣  Add Timestamps   │
+              └───────────┬───────────┘
+                          │
+                          ▼
+              ┌───────────────────────┐
+              │   OUTPUT FILES        │
+              │                       │
+              │  📄 transcript.txt    │
+              │     (plain text)      │
+              │                       │
+              │  ⏱️  detailed.txt      │
+              │     (with timestamps) │
+              │                       │
+              │  🎵 audio.mp3         │
+              │     (if from video)   │
+              └───────────────────────┘
+```
+
+### Example: What You Get
+
+**Input:** `presentation.mp4` (1.2 GB, 30 minutes)
+
+**Processing:**
+1. Detects MP4 video format ✅
+2. Extracts audio → `presentation_audio.mp3` (30 MB)
+3. Loads Whisper model (first time: downloads ~150MB)
+4. Detects language → English
+5. Transcribes in ~2 minutes (with base model)
+
+**Output:**
+- `presentation_transcript.txt` - Clean text
+- `presentation_transcript_detailed.txt` - Text with timestamps
+- `presentation_audio.mp3` - Extracted audio
+
+**Detailed transcript example:**
+```
+[0.00s - 5.20s] Hello everyone, welcome to today's presentation.
+[5.20s - 12.50s] Today we'll discuss the key features of our new product.
+[12.50s - 18.30s] Let's start with the technical architecture.
+```
+
+> 📊 **See detailed workflow diagrams:** [docs/workflow_diagram.md](docs/workflow_diagram.md)
 
 ## Dependencies
 
